@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Events;
+using System;
 using System.Collections;
 
-public class Program
+
+public class Program 
 {
 
     public static void Main()
@@ -10,8 +12,8 @@ public class Program
         OrderPlaced op = new OrderPlaced();
         NotifyThruMsg msg = new NotifyThruMsg();
         NotifyThruMail email = new NotifyThruMail();
-        op.SendMessage += msg.Message;
-        op.SendMessage += email.Mail;
+        op.SendMessageEvent += msg.Message;
+        op.SendMessageEvent += email.Mail;
 
         //STEP 6 : Trigger the event,i.e call the method that starts the event
         op.Order(515, "Paint",109879);
@@ -38,7 +40,7 @@ public class OrderPlacedEventArgs : EventArgs
 //STEP 3 : Event class,with an event variable and method that raises the event "protected virtual void mname()"
 public class OrderPlaced
 {
-    public event Notify SendMessage;
+    public event Notify SendMessageEvent;
     public void Order(int OrderNo,string OrderItem,int CustId)
     {
         Console.WriteLine($"{CustId} placed {OrderNo} for {OrderItem}");
@@ -46,27 +48,20 @@ public class OrderPlaced
     }
     protected virtual void OrderSuccess(int OrderNumber,string OrderItem,int CustId)
     {
-        if(SendMessage != null)
+        if(SendMessageEvent != null)
         {
-            SendMessage(this, new OrderPlacedEventArgs(OrderNumber,OrderItem,CustId));
+            SendMessageEvent(this, new OrderPlacedEventArgs(OrderNumber,OrderItem,CustId));
         }
     }
 }
 //STEP 4 : Subscriber/EventHandler with method signature matching delegate's signature
-public class NotifyThruMsg
-{
-    public void Message(object source,OrderPlacedEventArgs orderargs)
-    {
-        Console.WriteLine($"Msg : Your order {orderargs.OrderNo} for {orderargs.Item} by {orderargs.CustId} placed on {DateTime.Now}");
-    }
-}
+//public class NotifyThruMsg
+//{
+//    public void Message(object source,OrderPlacedEventArgs orderargs)
+//    {
+//        Console.WriteLine($"Msg : Your order {orderargs.OrderNo} for {orderargs.Item} by {orderargs.CustId} placed on {DateTime.Now}");
+//    }
+//}
 
 
-public class NotifyThruMail
-{
-    public void Mail(object source,OrderPlacedEventArgs orderargs)
-    {
-        Console.WriteLine($"Email for your order {orderargs.OrderNo} , {orderargs.Item} , {orderargs.CustId}");
-    }
 
-}
